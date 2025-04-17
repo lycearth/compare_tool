@@ -73,82 +73,16 @@ if purchase_file and quote_file:
 
 # 在 session_state 存在未匹配数据时，显示人工匹配表单及结果
 if "df_unmatched_p" in st.session_state and "df_unmatched_q" in st.session_state:
-    # 确保手动匹配记录存在
-    if "manual_matches" not in st.session_state:
-        st.session_state.manual_matches = {}
+    # 可折叠的人工匹配区
+    with st.expander("🔎 未匹配 - 人工指定报价项", expanded=True):
+        with st.form("manual_match_form"):
+            c1, c2 = st.columns(2)
+            items = list(st.session_state.df_unmatched_p.iterrows())
+            mid = len(items) // 2
+            render_matching_column(items[:mid], c1)
+            render_matching_column(items[mid:], c2)
 
-    # 顶层回调：应用人工匹配逻辑
-    def apply_manual_matches():
-        df_unmatched_p = st.session_state["df_unmatched_p"]
-        df_unmatched_q = st.session_state["df_unmatched_q"]
-        df_matched     = st.session_state["df_matched"]
-        manual_matches = st.session_state["manual_matches"]
-
-        applied = 0
-        for p_idx, q_ident in list(manual_matches.items()):
-            rows = df_unmatched_q[df_unmatched_q["报价_标识"] == q_ident]
-            if not rows.empty and p_idx in df_unmatched_p.index:
-                rq = rows.iloc[0]
-                new = {
-                    "采购_标识": df_unmatched_p.at[p_idx, "采购_标识"],
-                    "报价_标识": rq["报价_标识"],
-                    "采购_单耗": df_unmatched_p.at[p_idx, "采购_单耗"],
-                    "报价_单耗": rq["报价_单耗"],
-                    "采购_单价": df_unmatched_p.at[p_idx, "采购_单价"],
-                    "报价_单价": rq["报价_单价"],
-                    "匹配方式": "人工匹配"
-                }
-                st.session_state.df_matched     = pd.concat([df_matched, pd.DataFrame([new])], ignore_index=True)
-                st.session_state.df_unmatched_q = df_unmatched_q[df_unmatched_q["报价_标识"] != q_ident]
-                st.session_state.df_unmatched_p = df_unmatched_p.drop(p_idx)
-                applied += 1
-
-        # 清空临时记录，提示
-        st.session_state.manual_matches = {}
-        st.success(f"✅ 共应用 {applied} 条人工匹配")
-
-    # 辅助：安全提取标识
-    def safe_identity(val, fallback):
-        if pd.isna(val) or not str(val).strip():
-            return fallback
-        return str(val).strip()
-
-    # 辅助：渲染匹配下拉框
-    def render_matching_column(item_list, container):
-        for idx, row in item_list:
-            pid = safe_identity(row["采购_标识"], f"行{idx}")
-            if idx not in st.session_state.manual_matches:
-                best, best_score = None, 0
-                toks_p = set(normalize_token_list(pid))
-                for _, rq in st.session_state.df_unmatched_q.iterrows():
-                    qid = safe_identity(rq["报价_标识"], "")
-                    common = toks_p & set(normalize_token_list(qid))
-                    if qid and safe_fuzzy_match(pid, qid) and len(common) > best_score:
-                        best_score, best = len(common), qid
-                if best:
-                    st.session_state.manual_matches[idx] = best
-
-            opts = ["（不匹配）"] + [
-                safe_identity(rq["报价_标识"], "未知") for _, rq in st.session_state.df_unmatched_q.iterrows()
-            ]
-            default = st.session_state.manual_matches.get(idx, "（不匹配）")
-            with container:
-                sel = st.selectbox(f"为采购项【{pid}】选报价：", opts, index=opts.index(default), key=f"sel_{idx}")
-                if sel != "（不匹配）":
-                    st.session_state.manual_matches[idx] = sel
-                else:
-                    st.session_state.manual_matches.pop(idx, None)
-
-# 可折叠的人工匹配区
-with st.expander("🔎 未匹配 - 人工指定报价项", expanded=True):
-    with st.form("manual_match_form"):
-        c1, c2 = st.columns(2)
-        items = list(st.session_state.df_unmatched_p.iterrows())
-        mid = len(items) // 2
-        render_matching_column(items[:mid], c1)
-        render_matching_column(items[mid:], c2)
-
-        submitted = st.form_submit_button("✅ 应用人工匹配并更新结果表")
+            submitted = st.form_submit_button("✅ 应用人工匹配并更新结果表")
 
     # 如果点击提交，立即执行回调
     if submitted:
