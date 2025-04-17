@@ -139,9 +139,9 @@ if "df_unmatched_p" in st.session_state and "df_unmatched_q" in st.session_state
                 else:
                     st.session_state.manual_matches.pop(idx, None)
 
-    # 表单渲染：下拉 + 提交
+# 可折叠的人工匹配区
+with st.expander("🔎 未匹配 - 人工指定报价项", expanded=True):
     with st.form("manual_match_form"):
-        st.subheader("🔎 未匹配 - 人工指定报价项")
         c1, c2 = st.columns(2)
         items = list(st.session_state.df_unmatched_p.iterrows())
         mid = len(items) // 2
