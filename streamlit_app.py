@@ -161,8 +161,10 @@ if "df_unmatched_p" in st.session_state and "df_unmatched_q" in st.session_state
         final_df.to_excel(writer, index=False, sheet_name="比对结果总表")
         wb = writer.book
         ws = writer.sheets["比对结果总表"]
-        red_fmt   = wb.add_format({'bg_color':'#FFECEC'})
-        green_fmt = wb.add_format({'bg_color':'#E8F5E9'})
+        # red_fmt   = wb.add_format({'bg_color':'#FFECEC'})
+        # green_fmt = wb.add_format({'bg_color':'#E8F5E9'})
+        red_fmt   = wb.add_format({'bg_color':'#FFCCCC'})
+        green_fmt = wb.add_format({'bg_color':'#C8E6C9'})
         for col in ["单耗差值","单价差值"]:
             if col in final_df.columns:
                 idx = final_df.columns.get_loc(col)
