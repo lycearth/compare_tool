@@ -6,7 +6,7 @@ from utils import build_final_table, highlight_diff, normalize_token_list, safe_
 
 # 页面配置
 st.set_page_config(page_title="采购与报价比对工具", layout="wide")
-st.title("📦 采购与报价比对工具")
+st.title("采购与报价比对工具")
 st.markdown(
     "上传采购与报价 Excel 或 CSV 文件，选择表头所在行与比对列，即可进行产品标识（名称/编号）、单耗、单价的自动比对。"
 )
@@ -88,7 +88,7 @@ def apply_manual_matches():
 
 # 主流程：上传后选择表头、映射、自动比对
 if purchase_file and quote_file:
-    st.subheader("👀 表头行选择")
+    st.subheader("表头行选择")
     purch_preview = pd.read_excel(purchase_file, header=None, nrows=10)
     quote_preview = pd.read_excel(quote_file, header=None, nrows=10)
 
@@ -109,17 +109,17 @@ if purchase_file and quote_file:
 
     col1, col2 = st.columns(2)
     with col1:
-        st.markdown("#### 📦 采购字段映射")
+        st.markdown("#### 采购字段映射")
         purch_identity = st.selectbox("产品标识列（采购）", purch_cols)
         purch_price    = st.selectbox("单价列（采购）", purch_cols, index=smart_index(purch_cols, "单价", "price"))
         purch_cons     = st.selectbox("单耗列（采购）", purch_cols, index=smart_index(purch_cols, "单耗", "consumption"))
     with col2:
-        st.markdown("#### 📋 报价字段映射")
+        st.markdown("#### 报价字段映射")
         quote_identity = st.selectbox("产品标识列（报价）", quote_cols)
         quote_price    = st.selectbox("单价列（报价）", quote_cols, index=smart_index(quote_cols, "单价", "price"))
         quote_cons     = st.selectbox("单耗列（报价）", quote_cols, index=smart_index(quote_cols, "单耗", "consumption"))
 
-    if st.button("🚀 开始比对"):
+    if st.button("开始比对"):
         df_matched, df_unmatched_p, df_unmatched_q = compare_data(
             df_purch, df_quote,
             {"identity": purch_identity, "price": purch_price, "consumption": purch_cons},
