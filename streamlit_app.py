@@ -132,8 +132,18 @@ if purchase_file and quote_file:
         st.success("✅ 自动比对完成，请继续人工比对或导出结果")
 
 if "df_unmatched_p" in st.session_state and "df_unmatched_q" in st.session_state:
+    # 初始化展开状态：默认折叠
+    if "expander_open" not in st.session_state:
+        st.session_state.expander_open = False
+
+    # 检查是否已有选择行为，则自动展开
+    for p_idx in st.session_state.df_unmatched_p.index:
+        if f"sel_{p_idx}" in st.session_state:
+            st.session_state.expander_open = True
+            break
+
     # 折叠面板：实时渲染所有下拉选择框
-    with st.expander("🔎 未匹配 - 人工指定报价项", expanded=False):
+    with st.expander("🔎 未匹配 - 人工指定报价项", expanded=st.session_state.expander_open):
         c1, c2 = st.columns(2)
         items = list(st.session_state.df_unmatched_p.iterrows())
         mid = len(items) // 2
@@ -145,7 +155,6 @@ if "df_unmatched_p" in st.session_state and "df_unmatched_q" in st.session_state
                 safe_identity(rq["报价_标识"], "未知")
                 for _, rq in st.session_state.df_unmatched_q.iterrows()
             ]
-            # 不指定 index，让 Streamlit 自动记忆每个 selectbox 的上次选项
             sel = c1.selectbox(f"为采购项【{pid}】选报价：", opts, key=f"sel_{idx}")
 
         # 右侧一半
@@ -197,7 +206,7 @@ if "df_unmatched_p" in st.session_state and "df_unmatched_q" in st.session_state
             sel_key = f"sel_{p_idx}"
             if sel_key in st.session_state:
                 del st.session_state[sel_key]
-        
+
         st.success(f"✅ 共应用 {applied} 条人工匹配")
 
     # 最后——显示并导出综合结果
