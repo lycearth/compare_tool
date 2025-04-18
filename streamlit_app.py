@@ -133,16 +133,16 @@ if purchase_file and quote_file:
 
 # 在 session_state 存在未匹配数据时，显示人工匹配表单及结果
 if "df_unmatched_p" in st.session_state and "df_unmatched_q" in st.session_state:
-    with st.expander("🔎 未匹配 - 人工指定报价项", expanded=True):
-        with st.form("manual_match_form"):
-            c1, c2 = st.columns(2)
-            items = list(st.session_state.df_unmatched_p.iterrows())
-            mid = len(items) // 2
-            render_matching_column(items[:mid], c1)
-            render_matching_column(items[mid:], c2)
-            submitted = st.form_submit_button("✅ 应用人工匹配并更新结果表")
+    # 折叠面板里实时渲染所有选择框
+with st.expander("🔎 未匹配 - 人工指定报价项", expanded=True):
+        c1, c2 = st.columns(2)
+        items = list(st.session_state.df_unmatched_p.iterrows())
+        mid = len(items) // 2
+        render_matching_column(items[:mid], c1)
+        render_matching_column(items[mid:], c2)
 
-    if submitted:
+    # 用一个普通按钮，一次性应用所有在 session_state.manual_matches 里的映射
+    if st.button("✅ 应用人工匹配并更新结果表"):
         apply_manual_matches()
 
     # 显示并导出最终结果
