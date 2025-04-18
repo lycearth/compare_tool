@@ -197,8 +197,8 @@ if "df_unmatched_p" in st.session_state and "df_unmatched_q" in st.session_state
             sel_key = f"sel_{p_idx}"
             if sel_key in st.session_state:
                 del st.session_state[sel_key]
-
-        st.success(f"✅ 共应用 {applied} 条人工匹配")     
+        
+        st.success(f"✅ 共应用 {applied} 条人工匹配")
 
     # 最后——显示并导出综合结果
     final_df = build_final_table(
