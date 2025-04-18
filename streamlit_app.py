@@ -192,7 +192,7 @@ if "df_unmatched_p" in st.session_state and "df_unmatched_q" in st.session_state
                 st.session_state.df_unmatched_p = df_p.drop(p_idx)
                 applied += 1
 
-        3) 清除已应用行对应的 selectbox 状态，其余保留
+        # 3) 清除已应用行对应的 selectbox 状态，其余保留
         for p_idx in manual_matches:
             sel_key = f"sel_{p_idx}"
             if sel_key in st.session_state:
