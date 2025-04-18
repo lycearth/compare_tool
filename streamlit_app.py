@@ -133,7 +133,7 @@ if purchase_file and quote_file:
 
 if "df_unmatched_p" in st.session_state and "df_unmatched_q" in st.session_state:
     # 折叠面板：实时渲染所有下拉选择框
-    with st.expander("🔎 未匹配 - 人工指定报价项", expanded=True):
+    with st.expander("🔎 未匹配 - 人工指定报价项", expanded=False):
         c1, c2 = st.columns(2)
         items = list(st.session_state.df_unmatched_p.iterrows())
         mid = len(items) // 2
@@ -193,12 +193,20 @@ if "df_unmatched_p" in st.session_state and "df_unmatched_q" in st.session_state
                 applied += 1
 
         # 3) 清除已应用行对应的 selectbox 状态，其余保留
+        # for p_idx in manual_matches:
+        #     sel_key = f"sel_{p_idx}"
+        #     if sel_key in st.session_state:
+        #         del st.session_state[sel_key]
+
+        # st.success(f"✅ 共应用 {applied} 条人工匹配")
+
         for p_idx in manual_matches:
             sel_key = f"sel_{p_idx}"
             if sel_key in st.session_state:
                 del st.session_state[sel_key]
-
-        st.success(f"✅ 共应用 {applied} 条人工匹配")
+        
+        st.success(f"✅ 共应用 {applied} 条人工匹配（未匹配列表已更新）")
+            
 
     # 最后——显示并导出综合结果
     final_df = build_final_table(
